@@ -14,9 +14,11 @@
                <label for="">Pasword</label>
                <input v-model="form.password" type="text" name="Pasword" id="Pasword">
                <br>
+               <span v-if="errorRes.errorStatus == true" style="color: red;">{{ errorRes.errorMessage }}</span>
+               <br>
                <button @click="onLogin">Login</button>
           </fieldset>
-         
+
      </div>
 </template>
 <script setup lang="ts">
@@ -26,7 +28,12 @@ definePageMeta({
 });
 const form = reactive({
      email: '',
-     password: ''
+     password: '',
+
+});
+const errorRes = reactive({
+     errorStatus: false,
+     errorMessage: ''
 });
 // fungsi call to api login
 const onLogin = async () => {
@@ -35,7 +42,23 @@ const onLogin = async () => {
                method: 'POST',
                body: form
           });
-          window.location.replace('/dashboard');
+          if (result.success) {
+               window.location.replace('/dashboard');
+          } else {
+               errorRes.errorMessage = result.message;
+               errorRes.errorStatus = true;
+          }
+          // if (result["status"]) {
+               // await navigateTo('/dashboard');
+          // } else {
+
+          // }
+          // if (result.success) {
+          // } else {
+          //      errorRes.errorMessage = result.message;
+          //      errorRes.errorStatus = true;
+          // }
+
 
      } catch (error) {
           console.log(error);
