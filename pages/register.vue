@@ -14,8 +14,14 @@
                                    <label for="kode">Kode Fasyankes</label>
                               </td>
                               <td>
-                                   <input v-model="fieldinput.kode" type="text" name="kode" id="kode">
+                                   <input v-model="fieldinput.kode" type="text" name="kode" id="kode"
+                                        @input="onInputKodeRS">
                               </td>
+                              <div v-if="loading">Loading...</div>
+                              <div v-if="errors">{{ errors.message }}</div>
+                              <ul v-if="datars">
+                                   <li v-for="item in datars" :key="item.kode">{{ item.kode }}-{{ item.nama }}</li>
+                              </ul>
                               <td>
                                    <button>Cari</button>
                               </td>
@@ -177,6 +183,8 @@ useHead({ title: 'Register' });
 definePageMeta({
      middleware: 'unauth'
 });
+import axios from 'axios'
+import { ref } from 'vue'
 const form = reactive({
      kode: '',
      nama: '',
@@ -219,6 +227,11 @@ const mydata = reactive({
 const formcaptcha = reactive({
      captcha: '',
 });
+const query = ref('')
+const datars = ref(null)
+const loading = ref(false)
+const errors = ref(null)
+// function
 const getCaptcha = async () => {
      const datacp = await $fetch('/api/captcha');
      mydata.captcha = datacp.svg
@@ -226,4 +239,29 @@ const getCaptcha = async () => {
 onMounted(() => {
      getCaptcha();
 });
+
+// get data fasyankes
+const onInputKodeRS = () => {
+     fetchDataRs(fieldinput.kode)
+}
+const fetchDataRs = async (searchQueryKode) => {
+     if (!searchQueryKode) {
+          datars.value = null
+          return
+     }
+     loading.value = true
+     try {
+          const response = await axios.post(`/api/register/cekkoders`,
+               {
+                    keyword: searchQueryKode
+               }
+          )
+          // console.log(response.data.faskes)
+          datars.value = response.data.faskes
+          // console.log(datars.value)
+     } catch (err) {
+     } finally {
+          loading.value = false
+     }
+}
 </script>
