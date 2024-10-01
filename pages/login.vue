@@ -14,6 +14,13 @@
                <label for="">Pasword</label>
                <input v-model="form.password" type="text" name="Pasword" id="Pasword">
                <br>
+               <br>
+               <!-- <div>{{mydata.captcha}}</div> -->
+               <div v-html="mydata.captcha" style="border: 1px solid gray; width: 200px; border-radius: 5px"></div>
+               <br>
+               <button @click="getCaptcha">Refresh Captcha</button>
+               <input v-model="formcaptcha.captcha" placeholder="Enter the captcha text" />
+               <br>
                <span v-if="errorRes.errorStatus == true" style="color: red;">{{ errorRes.errorMessage }}</span>
                <br>
                <button @click="onLogin">Login</button>
@@ -22,51 +29,74 @@
      </div>
 </template>
 <script setup lang="ts">
+// import { ref, onMounted } from 'vue';
+// import { useFetch } from '#app';
+import images from '~/assets/images/bg-captcha.png';
+import captcha from '~/server/api/captcha';
 useHead({ title: 'Login' });
 definePageMeta({
      middleware: 'unauth'
 });
+
 const form = reactive({
      email: '',
      password: '',
-
+});
+const formcaptcha = reactive({
+     captcha: '',
 });
 const errorRes = reactive({
      errorStatus: false,
-     errorMessage: ''
+     errorMessage: '',
+});
+const mydata = reactive({
+     captcha: '',
+     lanjutlogin: false,
 });
 // fungsi call to api login
 const onLogin = async () => {
      try {
-          const result = await $fetch('/api/login', {
+          const datacaptcha = await $fetch('/api/verify-captcha', {
                method: 'POST',
-               body: form
+               body: formcaptcha,
           });
-          if (result.success) {
-               window.location.replace('/dashboard');
-          } else {
-               errorRes.errorMessage = result.message;
+          if (datacaptcha.valid == false) {
+               errorRes.errorMessage = datacaptcha.message;
                errorRes.errorStatus = true;
+          } else {
+               mydata.lanjutlogin = true;
           }
-          // if (result["status"]) {
-               // await navigateTo('/dashboard');
-          // } else {
 
-          // }
-          // if (result.success) {
-          // } else {
-          //      errorRes.errorMessage = result.message;
-          //      errorRes.errorStatus = true;
-          // }
-
-
+          if (mydata.lanjutlogin == true) {
+               const result = await $fetch('/api/login', {
+                    method: 'POST',
+                    body: form
+               });
+               console.log("====== status", result.status)
+               if (result.status) {
+                    window.location.replace('/dashboard');
+               } else {
+                    errorRes.errorStatus = true;
+                   errorRes.errorMessage = result.message;
+               }
+          }
      } catch (error) {
           console.log(error);
-          // throw createError({
-          //      statusCode: 500,
-          //      statusMessage: "Something went wrong"
-          // })
           alert('failed to login');
      }
+     formcaptcha.captcha = '';
+     getCaptcha(); 
 };
+// var captchaSvg = '';
+const userInput = ref('');
+const captchaInput = ref('');
+const errorMessage = ref('');
+const successMessage = ref('');
+const getCaptcha = async () => {
+     const datacp = await $fetch('/api/captcha');
+     mydata.captcha = datacp.svg // Memperbarui SVG CAPTCHA
+};
+onMounted(() => {
+     getCaptcha(); // Mendapatkan CAPTCHA saat komponen pertama kali di-mount
+});
 </script>
