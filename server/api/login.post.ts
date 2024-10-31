@@ -1,8 +1,13 @@
 import { useSessionAuth } from "@/server/utils/session";
+import axios from "axios";
 interface Login {
   email: string;
   password: string;
 }
+// interface DataLogin {
+//   status: boolean;
+//   message: JSON;
+// }
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody<Login>(event);
@@ -18,24 +23,61 @@ export default defineEventHandler(async (event) => {
         message: "Password harus diisi",
       };
     }
-    if (body.email == "jufentosemry@gmail.com" && body.password == "123456") {
-      const session = await useSessionAuth(event);
-      await session.update({
-        name: "Semry",
-        email: "jufentosemry@gmail.com",
+    const data = {
+      email: body.email,
+      password: body.password,
+    };
+    const config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: process.env.SERVICE_URL + "/api/v1/auth/login",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      data: data,
+    };
+    let datalogin = null;
+    await axios
+      .request(config)
+      .then((response) => {
+        datalogin = response.data;
+        // // if(datalogin)
+        // // return datalogin;
+      })
+      .catch((error) => {
+        console.log(error);
+        throw createError({
+          statusCode: 500,
+          statusMessage: "Something went wrong",
+        });
       });
-      return {
-        status: true,
-        message: "Success Login",
-      };
+      console.log(datalogin)
+    if (datalogin!.status == true) {
+      if (datalogin!.token) {
+        const session = await useSessionAuth(event);
+        await session.update({
+          token: datalogin!.token,
+          email: datalogin!.email,
+        });
+        return {
+          status: true,
+          message: "Success Login",
+        };
+      } else {
+        return {
+          status: false,
+          message: "Proses login gagal",
+        };
+      }
     } else {
       return {
         status: false,
-        message: "Email tidak terdaftar",
+        message: datalogin!.messages,
+        error: datalogin!.error,
       };
     }
   } catch (error) {
-    // console.log(error)
+    console.log(error)
     throw createError({
       statusCode: 500,
       statusMessage: "Something went wrong",

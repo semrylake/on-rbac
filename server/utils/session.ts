@@ -1,7 +1,8 @@
 import { type H3Event, type SessionConfig } from 'h3';
 type AuthValue = {
-     name: string;
+     // name: string;
      email: string;
+     token: string;
 }
 type CaptchaValue = {
      name: string;
@@ -9,12 +10,12 @@ type CaptchaValue = {
 }
 export const sessionAuthConfig: SessionConfig = {
      name: 'auth',
-     password: 'semrydev-ktki-2024_app@fasyankes',
+     password: 'semrydev-rbac-2024_app@rbac_admin',
      cookie: {
           path: '/',
           httpOnly: true,
           sameSite: 'strict',
-          maxAge: 60 * 60 * 2 //2 jam
+          maxAge: 60 * 60 * 1 //2 jam
      }
 }
 export const sessionCaptchaConfig: SessionConfig = {
