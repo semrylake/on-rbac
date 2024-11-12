@@ -15,7 +15,7 @@ export const sessionAuthConfig: SessionConfig = {
           path: '/',
           httpOnly: true,
           sameSite: 'strict',
-          maxAge: 60 * 60 * 1 //2 jam
+          maxAge: 60 * 60 //1 jam
      }
 }
 export const sessionCaptchaConfig: SessionConfig = {

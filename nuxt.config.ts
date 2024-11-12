@@ -15,10 +15,11 @@ export default defineNuxtConfig({
      * @default "./components/ui"
      */
     componentDir: "./components/ui",
+    
   },
-  // runtimeConfig: {
-  //   public: {
-  //     SERVICE_API_URL: process.env.SERVICE_URL
+  // routeRules: {
+  //   '*': {
+  //     appMiddleware:'check-response'
   //   }
   // }
 });
