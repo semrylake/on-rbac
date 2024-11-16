@@ -18,7 +18,7 @@
                                         <TableHead>Menu</TableHead>
                                         <TableHead>Path</TableHead>
                                         <TableHead>Status</TableHead>
-                                        <TableHead>Actions</TableHead>
+                                        <TableHead colspan="2" class="center">Action</TableHead>
                                    </TableRow>
                               </TableHeader>
                               <TableBody>
@@ -29,26 +29,50 @@
                                         <TableCell>
                                              {{ list_menus.nama }}
                                         </TableCell>
-                                        <TableCell class="hidden md:table-cell">
+                                        <TableCell>
                                              {{ list_menus.url }}
                                         </TableCell>
-                                        <TableCell class="hidden md:table-cell">
-                                             {{ (list_menus.status == 1) ? 'Aktif' : 'Tidak Aktif' }}
+                                        <TableCell>
+                                             <Badge v-if="list_menus.status == 1" class="bg-green-600">
+                                                  Aktif
+                                             </Badge>
+                                             <Badge v-else class="bg-red-600">
+                                                  Tidak Aktif
+                                             </Badge>
+                                        </TableCell>
+                                        <TableCell class="flex">
+                                             <Button variant="outline"
+                                                  class="bg-cyan-600 text-white hover:bg-cyan-500 hover:text-white">
+                                                  Edit
+                                             </Button>
+
+                                             <AlertDialog>
+                                                  <AlertDialogTrigger as-child>
+                                                       <Button variant="outline"
+                                                            class="bg-red-600 text-white hover:bg-red-500 hover:text-white">
+                                                            Delete
+                                                       </Button>
+                                                  </AlertDialogTrigger>
+                                                  <AlertDialogContent>
+                                                       <AlertDialogHeader>
+                                                            <AlertDialogTitle>Yakin menghapus data?
+                                                            </AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                 Pilih "<strong>Cancel</strong>" jika ingin membatalkan
+                                                                 aksi ini. Atau klik "<strong>Ok</strong>" untuk
+                                                                 menghapus data ini
+                                                            </AlertDialogDescription>
+                                                       </AlertDialogHeader>
+                                                       <AlertDialogFooter>
+                                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                            <AlertDialogAction
+                                                                 @:click="handleDeleteData(list_menus.kode_menu)">Ok
+                                                            </AlertDialogAction>
+                                                       </AlertDialogFooter>
+                                                  </AlertDialogContent>
+                                             </AlertDialog>
                                         </TableCell>
                                         <TableCell>
-                                             <DropdownMenu>
-                                                  <DropdownMenuTrigger as-child>
-                                                       <Button aria-haspopup="true" size="icon" variant="ghost">
-                                                            <MoreHorizontal class="h-4 w-4" />
-                                                            <span class="sr-only">Toggle menu</span>
-                                                       </Button>
-                                                  </DropdownMenuTrigger>
-                                                  <DropdownMenuContent align="end">
-                                                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                       <DropdownMenuItem>Edit</DropdownMenuItem>
-                                                       <DropdownMenuItem>Delete</DropdownMenuItem>
-                                                  </DropdownMenuContent>
-                                             </DropdownMenu>
                                         </TableCell>
                                    </TableRow>
                               </TableBody>
@@ -68,18 +92,6 @@
                          <CardTitle>Form Add Menu</CardTitle>
                     </CardHeader>
                     <CardContent class="grid gap-4">
-                         <!-- <div class="grid gap-2 mt-5">
-                                   <Label for="name">Name</Label>
-                                   <Input id="name" type="text" required class="border-gray-300 rounded-lg"
-                                        style="border-radius: 5px;" />
-                                   <p class="text-red-400"></p>
-                              </div>
-                              <div class="grid gap-2">
-                                   <Label for="name">Path</Label>
-                                   <Input id="name" type="text" required class="border-gray-300 rounded-lg"
-                                        style="border-radius: 5px;" />
-                                   <p class="text-red-400"></p>
-                              </div> -->
                          <form @submit.prevent="handleSubmitAdd">
                               <Alert class="mt-3 border-green-500 bg-green-300" v-if="statussubmitmenu == true">
                                    <AlertTitle>Success</AlertTitle>
@@ -150,6 +162,8 @@
                     </CardFooter>
                </Card>
           </div>
+
+
      </div>
 </template>
 
@@ -163,6 +177,17 @@ import { onMounted } from 'vue';
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import {
+     AlertDialog,
+     AlertDialogAction,
+     AlertDialogCancel,
+     AlertDialogContent,
+     AlertDialogDescription,
+     AlertDialogFooter,
+     AlertDialogHeader,
+     AlertDialogTitle,
+     AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -179,6 +204,7 @@ import {
      ArrowLeft,
      Save
 } from 'lucide-vue-next'
+import { isTemplateExpression } from 'typescript';
 
 onMounted(() => {
      startFrom = 0;
@@ -221,6 +247,7 @@ function resetErrors() {
 const errors_add = ref(null)
 
 const response_submit = ref(null);
+const response_delete = ref(null);
 let statussubmitmenu = false;
 
 const fetchDataMenu = async () => {
@@ -242,6 +269,7 @@ const fetchDataMenu = async () => {
 }
 function onShowFormAdd() {
      try {
+          statussubmitmenu = false;
           showFormTambah.value = !showFormTambah.value;
           resetErrors();
           resetFormAdd();
@@ -291,6 +319,27 @@ function validateName() {
      onsubmitstatus = false;
      return errors.total
 }
+// const onCloseDialog = () => {
+//   isDialogOpen.value = false;
+// };
+const openDeleteDialog = ref(false);
+const handleDeleteData = async (kode_menu) => {
+     // console.log("delete data: ", kode_menu)
+     response_delete.value = await $fetch('/api/menu/delete', {
+          method: 'POST',
+          body: {
+               kode: kode_menu
+          },
+     });
+     if (response_submit.value.status == true) {
+          alert("Data berhasil dihapus")
+          startFrom = 0;
+          fetchDataMenu();
+     } else {
+          alert("Data Gagal dihapus")
+     }
+     kode_menu = null;
+};
 const handleSubmitAdd = async () => {
      onsubmitstatus = true;
      statussubmitmenu = false;

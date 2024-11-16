@@ -7,8 +7,9 @@
                          Login
                     </CardTitle>
                     <CardDescription>
-                         Masukan Email dan password akun anda
+                         Masukan Email dan Password
                     </CardDescription>
+                    <hr>
                </CardHeader>
                <CardContent class="grid gap-4">
                     <div class="grid gap-2">
@@ -19,6 +20,9 @@
                     </div>
                     <div class="grid gap-2">
                          <Label for="password">Password</Label>
+                         <!-- Form Group -->
+
+                         <!-- End Form Group -->
                          <div class="flex">
                               <Input id="password" v-model="form.password" type="password" required
                                    class="border-gray-300 rounded-lg" style="border-radius: 5px;" />
@@ -26,6 +30,13 @@
                                    style="border-radius: 5px;" @click="changeTipePassword">
                                    <Icon name="uil:eye" class="" style="font-weight: bold; size: 5em;" />
                               </Button> -->
+                         </div>
+                         <div class="flex items-center space-x-2">
+                              <Checkbox id="terms" @click="changeTipePassword" />
+                              <label for="terms"
+                                   class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                   Tampilkan Password
+                              </label>
                          </div>
                          <p class="text-red-400">{{ error_message.password }}</p>
                     </div>
@@ -75,6 +86,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import Label from '~/components/ui/label/Label.vue';
+import { Checkbox } from '@/components/ui/checkbox'
 useHead({ title: 'Login' });
 definePageMeta({
      middleware: 'unauth'
