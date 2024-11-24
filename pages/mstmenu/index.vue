@@ -3,7 +3,7 @@
           <Button class="mb-1 bg-slate-800" @click="onShowFormAdd">
                <Plus v-if="showFormTambah == false" class="mr-1" />
                <ArrowLeft v-else class="mr-1" />
-               {{ (showFormTambah == false) ? 'Add' : 'Back' }}
+               {{ (showFormTambah == false) ? 'Tambah' : 'Kembali' }}
           </Button>
           <div v-if="showFormTambah == false">
                <Card class="shadow">
@@ -41,7 +41,7 @@
                                              </Badge>
                                         </TableCell>
                                         <TableCell class="flex">
-                                             <Button variant="outline"
+                                             <Button variant="outline" @click="showDetail(list_menus)"
                                                   class="bg-cyan-600 text-white hover:bg-cyan-500 hover:text-white">
                                                   Edit
                                              </Button>
@@ -86,10 +86,84 @@
                     </CardFooter>
                </Card>
           </div>
+          <div v-else-if="showFormTambah == 'edit'">
+               <Card class="shadow">
+                    <CardHeader class="shadow">
+                         <CardTitle>Form Edit Menu</CardTitle>
+                    </CardHeader>
+                    <CardContent class="grid gap-4">
+                         <form @submit.prevent="handleSubmitEdit">
+                              <Alert class="mt-3 border-green-500 bg-green-300" v-if="statussubmitmenu == true">
+                                   <AlertTitle>Success</AlertTitle>
+                                   <AlertDescription>
+                                        Data berhasil disimpan
+                                   </AlertDescription>
+                              </Alert>
+                              <div class="grid gap-4 py-4">
+                                   <div class="grid gap-2">
+                                        <Label for="name">Nama Menu</Label>
+                                        <Input id="name" type="text" v-model="form_edit.nama" class="" />
+                                        <p v-if="errors.nama" class="error text-red-400 font-bold">{{ errors.nama }}</p>
+                                   </div>
+                                   <div class="grid gap-2">
+                                        <Label for="path">Path atau Module</Label>
+                                        <Input type="text" id="path" v-model="form_edit.path" class="col-span-3" />
+                                        <p v-if="errors.path" class="error text-red-400 font-bold">{{ errors.path }}</p>
+                                   </div>
+                                   <div class="grid gap-2">
+                                        <Label for="desc">
+                                             Deskripsi
+                                        </Label>
+                                        <Input id="desc" type="text" v-model="form_edit.desc" class="col-span-3" />
+                                   </div>
+                                   <div class="grid gap-2">
+                                        <Label for="desc">
+                                             Status
+                                        </Label>
+                                        <Select v-model="form_edit.status">
+                                             <SelectTrigger class="w-full col-span-3">
+                                                  <SelectValue placeholder="Pilih Status" />
+                                             </SelectTrigger>
+                                             <SelectContent>
+                                                  <SelectGroup>
+                                                       <SelectItem v-for="option in optionsStatus" :key="option.value"
+                                                            :value="option.value">
+                                                            {{ option.label }}
+                                                       </SelectItem>
+                                                  </SelectGroup>
+                                             </SelectContent>
+                                        </Select>
+                                        <p v-if="errors.status" class="error text-red-400 font-bold">{{ errors.status }}
+                                        </p>
+                                   </div>
+                                   <div class="grid gap-2">
+                                        <Label for="desc">
+
+                                        </Label>
+                                        <div class="col-span-1">
+                                             <Button type="submit" v-if="onsubmitstatus == false">
+                                                  <Save class="mr-1" />
+                                                  Update
+                                             </Button>
+                                             <Button disabled v-else>
+                                                  <span>Loading......</span>
+                                             </Button>
+
+                                        </div>
+                                   </div>
+                              </div>
+                              <DialogFooter>
+                              </DialogFooter>
+                         </form>
+                    </CardContent>
+                    <CardFooter>
+                    </CardFooter>
+               </Card>
+          </div>
           <div v-else>
                <Card class="shadow">
                     <CardHeader class="shadow">
-                         <CardTitle>Form Add Menu</CardTitle>
+                         <CardTitle>Form Tambah Menu</CardTitle>
                     </CardHeader>
                     <CardContent class="grid gap-4">
                          <form @submit.prevent="handleSubmitAdd">
@@ -143,7 +217,7 @@
                                         <div class="col-span-1">
                                              <Button type="submit" v-if="onsubmitstatus == false">
                                                   <Save class="mr-1" />
-                                                  Save
+                                                  Simpan
                                              </Button>
                                              <Button disabled v-else>
                                                   <span>Loading......</span>
@@ -204,7 +278,6 @@ import {
      ArrowLeft,
      Save
 } from 'lucide-vue-next'
-import { isTemplateExpression } from 'typescript';
 
 onMounted(() => {
      startFrom = 0;
@@ -214,16 +287,35 @@ const datamenu = ref(null);
 const pagination = ref(null);
 let startFrom = 0;
 const showFormTambah = ref(false);
+const showFormEdit = ref(false);
 const optionsStatus = ref([
      { value: '1', label: 'Aktif' },
      { value: '0', label: 'Tidak Aktif' },
 ])
+const form_edit = reactive({
+     kode: '',
+     nama: '',
+     path: '',
+     desc: '',
+     status: '',
+});
 const form_add = reactive({
      nama: '',
      path: '',
      desc: '',
      status: '',
 });
+
+
+// Fungsi untuk menampilkan detail menu
+function showDetail(menu) {
+     form_edit.kode = menu.kode_menu;
+     form_edit.nama = menu.nama;
+     form_edit.path = menu.url;
+     form_edit.desc = menu.desc;
+     form_edit.status = menu.status;
+     showFormTambah.value = 'edit';
+}
 // Data error untuk validasi
 const errors = reactive({
      path: '',
@@ -236,6 +328,13 @@ function resetFormAdd() {
      form_add.path = '';
      form_add.desc = '';
      form_add.status = '';
+
+     form_edit.kode = '';
+     form_edit.nama = '';
+     form_edit.path = '';
+     form_edit.desc = '';
+     form_edit.status = '';
+     onsubmitstatus = false;
 }
 function resetErrors() {
      errors.nama = '';
@@ -262,7 +361,6 @@ const fetchDataMenu = async () => {
                startFrom = pagination.value.number;
           }
      } catch (err) {
-          // console.log(err.statusCode)
           alert("gagal mengambil data")
      } finally {
      }
@@ -281,11 +379,48 @@ function onShowFormAdd() {
      }
 };
 let onsubmitstatus = false;
-// Fungsi validasi untuk input nama
+
 function validateName() {
      const path = form_add.path;
      const nama = form_add.nama;
      const status = form_add.status;
+     errors.nama = '';
+     errors.path = '';
+     errors.status = '';
+     errors.total = 0;
+     // Validasi required (tidak boleh kosong)
+     errors.total = 0;
+     if (!nama) {
+          errors.total++;
+          errors.nama = 'Nama menu harus diisi';
+     }
+     if (!status) {
+          errors.total++;
+          errors.status = 'Status harus diisi';
+     }
+     if (!path) {
+          errors.total++;
+          errors.path = 'Path harus diisi';
+     }
+     // Validasi tidak boleh mengandung angka atau spasi
+     else if (/\d/.test(path)) {
+          errors.total++;
+          errors.path = 'Path tidak boleh mengandung angka';
+     }
+     else if (/\s/.test(path)) {
+          errors.total++;
+          errors.path = 'Path tidak boleh mengandung spasi';
+     }
+     else {
+          errors.path = ''; // Tidak ada error
+     }
+     onsubmitstatus = false;
+     return errors.total
+}
+function validateNameEdit() {
+     const path = form_edit.path;
+     const nama = form_edit.nama;
+     const status = form_edit.status;
      errors.nama = '';
      errors.path = '';
      errors.status = '';
@@ -319,19 +454,15 @@ function validateName() {
      onsubmitstatus = false;
      return errors.total
 }
-// const onCloseDialog = () => {
-//   isDialogOpen.value = false;
-// };
 const openDeleteDialog = ref(false);
 const handleDeleteData = async (kode_menu) => {
-     // console.log("delete data: ", kode_menu)
      response_delete.value = await $fetch('/api/menu/delete', {
           method: 'POST',
           body: {
                kode: kode_menu
           },
      });
-     if (response_submit.value.status == true) {
+     if (response_delete.value.status == true) {
           alert("Data berhasil dihapus")
           startFrom = 0;
           fetchDataMenu();
@@ -363,4 +494,28 @@ const handleSubmitAdd = async () => {
      }
 
 }
+const handleSubmitEdit = async () => {
+     onsubmitstatus = true;
+     statussubmitmenu = false;
+     validateNameEdit();
+     if (errors.total == 0) {
+          response_submit.value = await $fetch('/api/menu/update_menu', {
+               method: 'POST',
+               body: form_edit
+          });
+          if (response_submit.value.status == true) {
+               statussubmitmenu = true;
+               resetFormAdd();
+               resetErrors();
+          } else {
+               statussubmitmenu = false;
+               errors.nama = response_submit.value.error.nama;
+               errors.path = response_submit.value.error.path;
+               errors.status = response_submit.value.error.status;
+          }
+     }
+
+}
+
+
 </script>

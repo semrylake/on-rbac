@@ -1,8 +1,14 @@
-<script setup lang=ts>
-//useHead({ title: 'Dashboard' });
-// definePageMeta({
-//      middleware: 'auth'
-// });
+<script setup lang="ts">
+import { computed, watchEffect,onMounted,watch } from 'vue';
+const pageTitle = ref('');
+// // Perbarui title secara dinamis
+onMounted(() => {
+  pageTitle.value = document.title
+});
+
+function getDynamicClass(value: string):string {
+  return pageTitle.value === value ? 'bg-cyan-600 text-white hover:bg-cyan-500 hover:text-white' : '';
+}
 const onlogout = async () => {
   try {
     await $fetch('/api/logout');
@@ -23,26 +29,19 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import {
-  AudioWaveform,
-  BadgeCheck,
+  MenuIcon,
+  Folder,
   CircleUser,
-  ChevronRight,
-  ChevronsUpDown,
   GalleryVerticalEnd,
-  LogOut,
   Database,
-  Monitor,
-  Accessibility,
-  Terminal,
-  TerminalIcon,
   MonitorCheck,
   Home,
-  Bell,
   Package2,
   Menu,
   User
 } from 'lucide-vue-next'
 import { ref } from 'vue'
+import { timestamp } from '@vueuse/core';
 
 // This is sample data.
 const data = {
@@ -65,78 +64,9 @@ const data = {
       icon: Database,
       isActive: false,
       items: [
-        {
-          title: 'Master Menu',
-          url: 'mstmenu',
-        },
 
       ],
     },
-    // {
-    //   title: 'Models',
-    //   url: '#',
-    //   icon: Bot,
-    //   items: [
-    //     {
-    //       title: 'Genesis',
-    //       url: '#',
-    //     },
-    //     {
-    //       title: 'Explorer',
-    //       url: '#',
-    //     },
-    //     {
-    //       title: 'Quantum',
-    //       url: '#',
-    //     },
-    //   ],
-    // },
-    // {
-    //   title: 'Documentation',
-    //   url: '#',
-    //   icon: BookOpen,
-    //   items: [
-    //     {
-    //       title: 'Introduction',
-    //       url: '#',
-    //     },
-    //     {
-    //       title: 'Get Started',
-    //       url: '#',
-    //     },
-    //     {
-    //       title: 'Tutorials',
-    //       url: '#',
-    //     },
-    //     {
-    //       title: 'Changelog',
-    //       url: '#',
-    //     },
-    //   ],
-    // },
-    // {
-    //   title: 'Settings',
-    //   url: '#',
-    //   icon: Settings2,
-    //   items: [
-    //     {
-    //       title: 'General',
-    //       url: '#',
-    //     },
-    //     {
-    //       title: 'Team',
-    //       url: '#',
-    //     },
-    //     {
-    //       title: 'Billing',
-    //       url: '#',
-    //     },
-    //     {
-    //       title: 'Limits',
-    //       url: '#',
-    //     },
-    //   ],
-    // },
   ],
 }
 
@@ -154,7 +84,8 @@ function setActiveTeam(team: typeof data.teams[number]) {
         <div class="flex h-full max-h-screen flex-col gap-2">
           <div class="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
             <a href="/dashboard" class="flex items-center gap-2 font-semibold">
-              <GalleryVerticalEnd class="h-6 w-6" />
+              <!-- <GalleryVerticalEnd class="h-6 w-6" /> -->
+              <img src="/assets/images/logo2.png" alt="" width="80">
               <span class="">OnRBAC</span>
             </a>
             <!-- <Button variant="outline" size="icon" class="ml-auto h-8 w-8">
@@ -164,20 +95,22 @@ function setActiveTeam(team: typeof data.teams[number]) {
           </div>
           <div class="flex-1">
             <nav class="grid items-start px-2 text-sm font-medium lg:px-4">
-              <a href="/dashboard"
+              <a href="/dashboard" :class="getDynamicClass('Dashboard')"
                 class="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
                 <Home class="h-4 w-4" />
                 Dashboard
               </a>
-              <a href="/mstmenu"
-                class="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
-                <User class="h-4 w-4" />
+              <a href="/mstmenu" :class="getDynamicClass('Master Menu')"
+                class=" flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
+                <Folder class="h-4 w-4" />
                 Master Menu
               </a>
-              
+              <a href="/mstpengguna" :class="getDynamicClass('Master Pengguna')"
+                class="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
+                <Folder class="h-4 w-4" />
+                Master Pengguna
+              </a>
             </nav>
-          </div>
-          <div class="mt-auto p-4">
           </div>
         </div>
       </div>
@@ -193,22 +126,29 @@ function setActiveTeam(team: typeof data.teams[number]) {
             <SheetContent side="left" class="flex flex-col">
               <nav class="grid gap-2 text-lg font-medium">
                 <a href="#" class="flex items-center gap-2 text-lg font-semibold">
-                  <Package2 class="h-6 w-6" />
-                  <span class="sr-only">OnRBAC</span>
+                  <!-- <Package2 class="h-6 w-6" />
+                  <span class="sr-only">OnRBAC</span> -->
+                  <img src="/assets/images/logo2.png" alt="" width="80">
+                  <span class="">OnRBAC</span>
                 </a>
-                <a href="/dashboard"
+                <a href="/dashboard" :class="dynamicClass('Dashboard')"
                   class="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground">
                   <Home class="h-5 w-5" />
                   Dashboard
                 </a>
-                <a href="/mstmenu"
+                <a href="/mstmenu" :class="dynamicClass('Master Menu')"
                   class="mx-[-0.65rem] flex items-center gap-4 rounded-xl bg-muted px-3 py-2 text-foreground hover:text-foreground">
-                  <User class="h-5 w-5" />
+                  <Folder class="h-5 w-5" />
                   Master Menu
                 </a>
-              
+                <a href="/mstpengguna" :class="dynamicClass('Master Pengguna')"
+                  class="mx-[-0.65rem] flex items-center gap-4 rounded-xl bg-muted px-3 py-2 text-foreground hover:text-foreground">
+                  <Folder class="h-5 w-5" />
+                  Master Pengguna
+                </a>
+
               </nav>
-              
+
             </SheetContent>
           </Sheet>
           <div class="w-full flex-1">
@@ -239,7 +179,6 @@ function setActiveTeam(team: typeof data.teams[number]) {
         </header>
         <main class="p-6">
           <slot></slot>
-
         </main>
         <!-- <main class="flex flex-1 flex-col gap-4 lg:gap-6 lg:p-6">
           <div class="flex items-center">

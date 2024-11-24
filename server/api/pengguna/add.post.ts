@@ -4,9 +4,9 @@ import { ErrorCodes } from "vue";
 import "@/server/api/utils/deletesession";
 interface DataMenu {
   nama: string;
-  path: string;
-  desc: string;
-  status: string;
+  email: string;
+  username: string;
+  password: string;
 }
 export default defineEventHandler(async (event) => {
   try {
@@ -15,15 +15,15 @@ export default defineEventHandler(async (event) => {
     const body = await readBody<DataMenu>(event);
     const datasubmit = {
       nama: body.nama,
-      path: body.path,
-      desc: body.desc,
-      status: body.status,
+      username: body.username,
+      email: body.email,
+      password: body.password,
     };
     const configdef = useRuntimeConfig();
     const configaxios = {
       method: "post",
       maxBodyLength: Infinity,
-      url: configdef.public.apiBaseUrl+ "/api/v1/menu/add",
+      url: configdef.public.apiBaseUrl+ "/api/v1/master-pengguna/add",
       headers: {
         Authorization: "Bearer " + token,
         "Content-Type": "application/x-www-form-urlencoded",

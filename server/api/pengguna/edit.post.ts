@@ -3,10 +3,11 @@ import axios from "axios";
 import { ErrorCodes } from "vue";
 import "@/server/api/utils/deletesession";
 interface DataMenu {
+  kode: string;
   nama: string;
-  path: string;
-  desc: string;
-  status: string;
+  email: string;
+  username: string;
+  password: string;
 }
 export default defineEventHandler(async (event) => {
   try {
@@ -14,16 +15,18 @@ export default defineEventHandler(async (event) => {
     const token = session.data.token;
     const body = await readBody<DataMenu>(event);
     const datasubmit = {
+      kode: body.kode,
       nama: body.nama,
-      path: body.path,
-      desc: body.desc,
-      status: body.status,
+      email: body.email,
+      username: body.username,
+      password: body.password,
     };
+    console.log(datasubmit)
     const configdef = useRuntimeConfig();
     const configaxios = {
       method: "post",
       maxBodyLength: Infinity,
-      url: configdef.public.apiBaseUrl+ "/api/v1/menu/add",
+      url: configdef.public.apiBaseUrl + "/api/v1/master-pengguna/edit",
       headers: {
         Authorization: "Bearer " + token,
         "Content-Type": "application/x-www-form-urlencoded",
@@ -36,6 +39,7 @@ export default defineEventHandler(async (event) => {
     await axios
       .request(configaxios)
       .then(function (response) {
+        console.log(response.data);
         if (response.data.status) {
           success = true;
           message = response.data.messages;
@@ -44,13 +48,9 @@ export default defineEventHandler(async (event) => {
           message = response.data.messages;
           errorMessage = response.data.error;
         }
-        //    return {
-        //      success: success,
-        //      message: message,
-        //    };
       })
       .catch(async function (error) {
-        console.log(error.status);
+        // console.log(error.status);
         if (error.status == 401) {
           return sendRedirect(event, "/login");
         }

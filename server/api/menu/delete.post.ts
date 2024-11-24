@@ -12,11 +12,12 @@ export default defineEventHandler(async (event) => {
     const body = await readBody<DeleteData>(event);
     const datadelete = {
       kode: body.kode,
-    };
+       };
+       const configdef = useRuntimeConfig();
     const configaxios = {
       method: "post",
       maxBodyLength: Infinity,
-      url: process.env.SERVICE_URL + "/api/v1/menu/delete",
+      url: configdef.public.apiBaseUrl+ "/api/v1/menu/delete",
       headers: {
         Authorization: "Bearer " + token,
         "Content-Type": "application/x-www-form-urlencoded",

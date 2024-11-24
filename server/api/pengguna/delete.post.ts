@@ -2,33 +2,27 @@ import { useSessionAuth } from "@/server/utils/session";
 import axios from "axios";
 import { ErrorCodes } from "vue";
 import "@/server/api/utils/deletesession";
-interface DataMenu {
-  nama: string;
-  path: string;
-  desc: string;
-  status: string;
+interface DeleteData {
+  kode: string;
 }
 export default defineEventHandler(async (event) => {
   try {
     const session = await useSessionAuth(event);
     const token = session.data.token;
-    const body = await readBody<DataMenu>(event);
-    const datasubmit = {
-      nama: body.nama,
-      path: body.path,
-      desc: body.desc,
-      status: body.status,
-    };
-    const configdef = useRuntimeConfig();
+    const body = await readBody<DeleteData>(event);
+    const datadelete = {
+      kode: body.kode,
+       };
+       const configdef = useRuntimeConfig();
     const configaxios = {
       method: "post",
       maxBodyLength: Infinity,
-      url: configdef.public.apiBaseUrl+ "/api/v1/menu/add",
+      url: configdef.public.apiBaseUrl+ "/api/v1/master-pengguna/delete",
       headers: {
         Authorization: "Bearer " + token,
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      data: datasubmit,
+      data: datadelete,
     };
     let success = false;
     let message = "";
@@ -44,19 +38,15 @@ export default defineEventHandler(async (event) => {
           message = response.data.messages;
           errorMessage = response.data.error;
         }
-        //    return {
-        //      success: success,
-        //      message: message,
-        //    };
       })
       .catch(async function (error) {
-        console.log(error.status);
+        // console.log(error.status);
         if (error.status == 401) {
           return sendRedirect(event, "/login");
         }
         throw createError({
           statusCode: error.status,
-          statusMessage: "failed submit :" + error.message,
+          statusMessage: "failed delete :" + error.message,
         });
       });
     if (success) {
@@ -71,6 +61,7 @@ export default defineEventHandler(async (event) => {
         error: errorMessage,
       };
     }
+    console.log(datadelete);
   } catch (error) {
     console.log(error);
     throw createError({

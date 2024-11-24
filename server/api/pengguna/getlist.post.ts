@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   const configaxios = {
     method: "post",
     maxBodyLength: Infinity,
-    url: configdef.public.apiBaseUrl+ "/api/v1/menu/getlist",
+    url: configdef.public.apiBaseUrl+ "/api/v1/master-pengguna/getlist",
     headers: {
       Authorization: "Bearer " + token,
     },
@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
   if (success) {
     return {
       success: success,
-      list_menu: resultdata,
+      list_data: resultdata,
       pagination: pagination,
     };
   } else {

@@ -27,10 +27,11 @@ export default defineEventHandler(async (event) => {
       email: body.email,
       password: body.password,
     };
+    const configdef = useRuntimeConfig();
     const config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: process.env.SERVICE_URL + "/api/v1/auth/login",
+      url: configdef.public.apiBaseUrl+ "/api/v1/auth/login",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
@@ -51,7 +52,6 @@ export default defineEventHandler(async (event) => {
           statusMessage: "Something went wrong",
         });
       });
-      console.log(datalogin)
     if (datalogin!.status == true) {
       if (datalogin!.token) {
         const session = await useSessionAuth(event);
