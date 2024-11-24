@@ -402,8 +402,6 @@ function resetFormAdd() {
   form_edit.email = '';
   form_edit.username = '';
   form_edit.password = '';
-
-
   onsubmitstatus = false;
 }
 function resetErrors() {
