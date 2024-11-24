@@ -2,9 +2,10 @@
 export default defineNuxtConfig({
   compatibilityDate: "2024-04-03",
   devtools: { enabled: true },
-  ssr: true,
+  // ssr: true,
   modules: ["@nuxt/eslint", "@nuxtjs/tailwindcss", "shadcn-nuxt", "@nuxt/icon"],
   css: ["~/assets/css/main.css"],
+  pages:true,
   shadcn: {
     prefix: "",
     componentDir: "./components/ui",
@@ -14,10 +15,10 @@ export default defineNuxtConfig({
       apiBaseUrl: "http://localhost:7778",
     },
   },
-  app: {
-    baseURL: "/on-rbac/",
-  },
-  nitro: {
-    preset: "static",
-  },
+  // app: {
+  //   baseURL: "/on-rbac/",
+  // },
+  // nitro: {
+  //   preset: "static",
+  // },
 });
