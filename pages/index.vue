@@ -26,7 +26,7 @@
             diberikan.
           </p>
           <nuxt-link class="px-6 py-2 bg-white text-gray-900 font-bold rounded hover:bg-gray-200"
-            to="/login">Masuk</nuxt-link>
+            to="/login">Login</nuxt-link>
         </div>
         <div class="w-full self-end px-4 lg:w-1/2">
           <div class="mt-10 relative lg:mt-9 lg:right-0">
