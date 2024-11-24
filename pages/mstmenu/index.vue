@@ -306,7 +306,6 @@ const form_add = reactive({
      status: '',
 });
 
-
 // Fungsi untuk menampilkan detail menu
 function showDetail(menu) {
      form_edit.kode = menu.kode_menu;
@@ -516,6 +515,4 @@ const handleSubmitEdit = async () => {
      }
 
 }
-
-
 </script>
